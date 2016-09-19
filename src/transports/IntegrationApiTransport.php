@@ -6,7 +6,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use matperez\yii2smssender\interfaces\ITransport;
 use yii\base\Component;
 
-class InternationalApiTransport extends Component implements ITransport
+class IntegrationApiTransport extends Component implements ITransport
 {
     /**
      * @var string

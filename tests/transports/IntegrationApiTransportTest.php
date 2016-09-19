@@ -5,14 +5,14 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 use matperez\yii2smssender\interfaces\ITransport;
-use matperez\yii2smssender\transports\InternationalApiTransport;
+use matperez\yii2smssender\transports\IntegrationApiTransport;
 use matperez\yii2smssender\tests\TestCase;
 use Psr\Http\Message\RequestInterface;
 
-class InternationalApiTransportTest extends TestCase
+class IntegrationApiTransportTest extends TestCase
 {
     /**
-     * @var InternationalApiTransport
+     * @var IntegrationApiTransport
      */
     private $transport;
 
@@ -34,7 +34,7 @@ class InternationalApiTransportTest extends TestCase
 
     public function testItWontSendMessageIfUnableToAuthenticate()
     {
-        /** @var InternationalApiTransport|\Mockery\Mock $transport */
+        /** @var IntegrationApiTransport|\Mockery\Mock $transport */
         $transport = \Mockery::mock($this->transport)->shouldAllowMockingProtectedMethods();
         $transport->setSessionId(null);
         $transport->shouldReceive('authenticate')->andReturn(false);
@@ -97,7 +97,7 @@ class InternationalApiTransportTest extends TestCase
     {
         parent::setUp();
         $this->client = \Mockery::mock(ClientInterface::class);
-        $this->transport = new InternationalApiTransport($this->client);
+        $this->transport = new IntegrationApiTransport($this->client);
         $this->transport->setSessionId('sessionid');
     }
 }
