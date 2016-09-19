@@ -3,6 +3,7 @@
     "license": "MIT",
     "description": "Yii2 SMS sender",
     "type": "project",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Andrey Golovin",
