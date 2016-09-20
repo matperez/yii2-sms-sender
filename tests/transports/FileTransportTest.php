@@ -1,6 +1,7 @@
 <?php
 namespace matperez\yii2smssender\tests\transports;
 
+use matperez\yii2smssender\exceptions\TransportException;
 use matperez\yii2smssender\tests\TestCase;
 use matperez\yii2smssender\transports\FileTransport;
 
@@ -32,6 +33,13 @@ class FileTransportTest extends TestCase
         $to = 'to';
         self::assertTrue($this->transport->send($from, $to, $message));
         self::assertFileExists($path);
+    }
+
+    public function testItWillThrowExceptionOnError()
+    {
+        $this->transport->path = '@not-exists';
+        self::expectException(TransportException::class);
+        $this->transport->send('from', 'to', 'message');
     }
 
     /**

@@ -4,10 +4,12 @@ namespace matperez\yii2smssender\tests\transports;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
+use matperez\yii2smssender\exceptions\TransportException;
 use matperez\yii2smssender\interfaces\ITransport;
 use matperez\yii2smssender\transports\IntegrationApiTransport;
 use matperez\yii2smssender\tests\TestCase;
 use Psr\Http\Message\RequestInterface;
+use yii\base\InvalidConfigException;
 
 class IntegrationApiTransportTest extends TestCase
 {
@@ -32,36 +34,30 @@ class IntegrationApiTransportTest extends TestCase
         self::assertTrue($this->transport->send('from', 'to', 'message'));
     }
 
-    public function testItWontSendMessageIfUnableToAuthenticate()
+    public function testItRequiresLoginAndPassword()
     {
-        /** @var IntegrationApiTransport|\Mockery\Mock $transport */
-        $transport = \Mockery::mock($this->transport)->shouldAllowMockingProtectedMethods();
-        $transport->setSessionId(null);
-        $transport->shouldReceive('authenticate')->andReturn(false);
-        self::assertFalse($transport->send('from', 'to', 'message'));
+        $this->expectException(InvalidConfigException::class);
+        $this->transport->setSessionId(null);
+        $this->transport->getSessionId();
     }
 
-    public function testItWontSendMessageOnGuzzleError()
+    public function testItWillThrowTransportExceptionOnOnGuzzleError()
     {
         $request = \Mockery::mock(RequestInterface::class);
         $exception = new RequestException('', $request);
         $this->client->shouldReceive('request')->andThrow($exception);
-        self::assertFalse($this->transport->send('from', 'to', 'message'));
+        self::expectException(TransportException::class);
+        $this->transport->send('from', 'to', 'message');
     }
 
-    public function testItWontSendMessageOnOtherErrors()
+    public function testItWillThrowTransportExceptionOnJsonErrors()
     {
-        $this->client->shouldReceive('request')->andThrow(new \Exception());
-        self::assertFalse($this->transport->send('from', 'to', 'message'));
+        $this->client->shouldReceive('request')->andThrow(new \InvalidArgumentException());
+        self::expectException(TransportException::class);
+        $this->transport->send('from', 'to', 'message');
     }
 
-    public function testItWontAuthenticateWithNoLoginOrPassword()
-    {
-        $this->transport->setSessionId(null);
-        self::assertNull($this->transport->getSessionId());
-    }
-
-    public function testItWontAuthenticateOnGuzzleException()
+    public function testItWillThrowTransportExceptionOnGuzzleExceptionWhenItsAuthenticating()
     {
         $this->transport->setSessionId(null);
         $this->transport->login = 'login';
@@ -69,16 +65,18 @@ class IntegrationApiTransportTest extends TestCase
         $request = \Mockery::mock(RequestInterface::class);
         $exception = new RequestException('', $request);
         $this->client->shouldReceive('request')->andThrow($exception);
-        self::assertNull($this->transport->getSessionId());
+        $this->expectException(TransportException::class);
+        $this->transport->getSessionId();
     }
 
-    public function testItWontAuthenticateOnOtherExceptions()
+    public function testItWillThrowTransportExceptionOnJsonExceptionWhenItsAuthenticating()
     {
         $this->transport->setSessionId(null);
         $this->transport->login = 'login';
         $this->transport->password = 'password';
-        $this->client->shouldReceive('request')->andThrow(new \Exception());
-        self::assertNull($this->transport->getSessionId());
+        $this->client->shouldReceive('request')->andThrow(\InvalidArgumentException::class);
+        $this->expectException(TransportException::class);
+        $this->transport->getSessionId();
     }
 
     public function testItAuthenticates()

@@ -3,8 +3,10 @@ namespace matperez\yii2smssender\transports;
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
+use matperez\yii2smssender\exceptions\TransportException;
 use matperez\yii2smssender\interfaces\ITransport;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 
 class IntegrationApiTransport extends Component implements ITransport
 {
@@ -51,11 +53,13 @@ class IntegrationApiTransport extends Component implements ITransport
 
     /**
      * @inheritdoc
+     * @throws \matperez\yii2smssender\exceptions\TransportException
+     * @throws \yii\base\InvalidConfigException
      */
     public function send($from, $to, $message)
     {
-        if (!$this->isAuthenticated() && !$this->authenticate()) {
-            return false;
+        if (!$this->isAuthenticated()) {
+            $this->authenticate();
         }
         $params = [
             'sessionId' => $this->sessionId,
@@ -68,20 +72,22 @@ class IntegrationApiTransport extends Component implements ITransport
         try {
             $this->client->request('POST', $this->baseUrl.'/Sms/Send', ['body' => $params]);
         } catch (GuzzleException $e) {
-            return false;
-        } catch (\Exception $e) {
-            return false;
+            throw new TransportException('Http client error: '.$e->getMessage(), $e->getCode(), $e);
+        } catch (\InvalidArgumentException $e) {
+            throw new TransportException('Unable to decode server response: '.$e->getMessage(), $e->getCode(), $e);
         }
         return true;
     }
 
     /**
      * @return bool
+     * @throws \matperez\yii2smssender\exceptions\TransportException
+     * @throws \yii\base\InvalidConfigException
      */
     protected function authenticate()
     {
         if (!$this->login || !$this->password) {
-            return false;
+            throw new InvalidConfigException('Login and password should be set.');
         }
         try {
             $response = $this->client->request('GET', $this->baseUrl . '/user/sessionid', [
@@ -92,9 +98,9 @@ class IntegrationApiTransport extends Component implements ITransport
             ]);
             $this->sessionId = \GuzzleHttp\json_decode((string) $response->getBody());
         } catch (GuzzleException $e) {
-            return false;
-        } catch (\Exception $e) {
-            return false;
+            throw new TransportException('Http client error: '.$e->getMessage(), $e->getCode(), $e);
+        } catch (\InvalidArgumentException $e) {
+            throw new TransportException('Unable to decode server response: '.$e->getMessage(), $e->getCode(), $e);
         }
         return true;
     }
@@ -117,6 +123,7 @@ class IntegrationApiTransport extends Component implements ITransport
 
     /**
      * @return string
+     * @throws \matperez\yii2smssender\exceptions\TransportException
      */
     public function getSessionId()
     {

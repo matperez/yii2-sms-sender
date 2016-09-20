@@ -2,6 +2,7 @@
 namespace matperez\yii2smssender\tests\components;
 
 use matperez\yii2smssender\components\Sender;
+use matperez\yii2smssender\exceptions\TransportException;
 use matperez\yii2smssender\interfaces\IMessage;
 use matperez\yii2smssender\interfaces\IMessageComposer;
 use matperez\yii2smssender\interfaces\ISender;
@@ -51,6 +52,16 @@ class SenderTest extends TestCase
         self::assertInstanceOf(IMessage::class, $message);
         self::assertEquals('template content', $message->getMessage());
         self::assertEquals($this->sender, $message->getSender());
+    }
+
+    public function testItShouldCatchTransportExceptions()
+    {
+        $message = new Message();
+        $message->setFrom('from');
+        $message->setTo('to');
+        $message->setMessage('message');
+        $this->transport->shouldReceive('send')->andThrow(TransportException::class);
+        self::assertFalse($this->sender->send($message));
     }
 
     protected function setUp()

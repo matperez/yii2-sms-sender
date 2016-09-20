@@ -4,7 +4,7 @@
 
 Yii2 SMS Sender
 
-## Usage
+## Setup
 
 ### Dev environment
 ```
@@ -42,7 +42,7 @@ Container config
 });
 ```
 
-### Messages sending 
+### Usage 
 
 ```
 $message = Yii::$app->sms->compose('some-view', $params);

@@ -1,6 +1,7 @@
 <?php
 namespace matperez\yii2smssender\components;
 
+use matperez\yii2smssender\exceptions\TransportException;
 use matperez\yii2smssender\interfaces\IMessage;
 use matperez\yii2smssender\interfaces\IMessageComposer;
 use matperez\yii2smssender\interfaces\ISender;
@@ -31,12 +32,14 @@ class Sender extends Component implements ISender, IMessageComposer
     /**
      * @inheritdoc
      * @throws \yii\base\InvalidParamException
+     * @throws \yii\base\InvalidConfigException
      */
     public function compose($view, array $data = [])
     {
         $content = \Yii::$app->getView()
             ->render($this->viewPath.'/'.$view, $data);
-        $message = new Message();
+        /** @var IMessage $message */
+        $message = \Yii::createObject(Message::class);
         $message->setMessage($content);
         $message->setSender($this);
         return $message;
@@ -48,8 +51,13 @@ class Sender extends Component implements ISender, IMessageComposer
      */
     public function send(Message $message)
     {
-        return $this->getTransport()
-            ->send($message->getFrom(), $message->getTo(), $message->getMessage());
+        try {
+            return $this->getTransport()
+                ->send($message->getFrom(), $message->getTo(), $message->getMessage());
+        } catch (TransportException $e) {
+            \Yii::error('Transport exception: '.$e->getMessage(), 'sms');
+            return false;
+        }
     }
 
     /**
