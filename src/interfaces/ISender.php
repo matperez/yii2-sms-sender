@@ -10,4 +10,14 @@ interface ISender
      * @return boolean
      */
     public function send(Message $message);
+
+    /**
+     * @return mixed
+     */
+    public function getBalance();
+
+    /**
+     * @return bool
+     */
+    public function canFetchBalance();
 }

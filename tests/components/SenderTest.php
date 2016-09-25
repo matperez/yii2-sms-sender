@@ -54,7 +54,7 @@ class SenderTest extends TestCase
         self::assertEquals($this->sender, $message->getSender());
     }
 
-    public function testItShouldCatchTransportExceptions()
+    public function testItShouldCatchTransportExceptionsOnSend()
     {
         $message = new Message();
         $message->setFrom('from');
@@ -62,6 +62,32 @@ class SenderTest extends TestCase
         $message->setMessage('message');
         $this->transport->shouldReceive('send')->andThrow(TransportException::class);
         self::assertFalse($this->sender->send($message));
+    }
+
+    public function testItShouldCatchTransportExceptionsOnBalanceFetching()
+    {
+        $this->transport->shouldReceive('canFetchBalance')->andReturn(true);
+        $this->transport->shouldReceive('getBalance')->andThrow(TransportException::class);
+        self::assertFalse($this->sender->getBalance());
+    }
+
+    public function testItShouldReturnBalance()
+    {
+        $this->transport->shouldReceive('canFetchBalance')->andReturn(true);
+        $this->transport->shouldReceive('getBalance')->andReturn(5);
+        self::assertEquals(5, $this->sender->getBalance());
+    }
+
+    public function testItCannotReturnBalanceIfTransportCannotDoIt()
+    {
+        $this->transport->shouldReceive('canFetchBalance')->andReturn(false);
+        self::assertFalse($this->sender->getBalance());
+    }
+
+    public function testItReturnsTransportAbilityToFetchBalance()
+    {
+        $this->transport->shouldReceive('canFetchBalance')->andReturn(true);
+        self::assertTrue($this->sender->canFetchBalance());
     }
 
     protected function setUp()

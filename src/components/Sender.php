@@ -61,6 +61,32 @@ class Sender extends Component implements ISender, IMessageComposer
     }
 
     /**
+     * @return mixed
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getBalance()
+    {
+        $transport = $this->getTransport();
+        if (!$transport->canFetchBalance()) {
+            return false;
+        }
+        try {
+            return $this->getTransport()->getBalance();
+        } catch (TransportException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @return bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function canFetchBalance()
+    {
+        return $this->getTransport()->canFetchBalance();
+    }
+
+    /**
      * @return ITransport
      * @throws \yii\base\InvalidConfigException
      */
