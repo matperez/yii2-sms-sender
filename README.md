@@ -42,11 +42,21 @@ Container config
 });
 ```
 
-### Usage 
+### Usage
+ 
+#### Sending a message 
 
 ```
 $message = Yii::$app->sms->compose('some-view', $params);
 $message->setTo('1234345456');
 $message->setFrom('sender');
 $message->send();
+```
+
+#### Balance checking
+
+```
+if (Yii::$app->sms->canFetchBalance()) {
+  $balance = Yii::$app->sms->getBalance();
+}
 ```

@@ -38,8 +38,15 @@ class FileTransportTest extends TestCase
     public function testItWillThrowExceptionOnError()
     {
         $this->transport->path = '@not-exists';
-        self::expectException(TransportException::class);
+        $this->expectException(TransportException::class);
         $this->transport->send('from', 'to', 'message');
+    }
+
+    public function testInCantFetchBalance()
+    {
+        self::assertFalse($this->transport->canFetchBalance());
+        $this->expectException(TransportException::class);
+        $this->transport->getBalance();
     }
 
     /**

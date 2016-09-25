@@ -88,6 +88,29 @@ class IntegrationApiTransportTest extends TestCase
         self::assertEquals('sessionid', $this->transport->getSessionId());
     }
 
+    public function testItCanFetchBalance()
+    {
+        self::assertTrue($this->transport->canFetchBalance());
+    }
+
+    public function testItThrowsTransportExceptionOnGuzzleErrorWhileFetchingBalance()
+    {
+        $this->transport->setSessionId('sessionid');
+        $request = \Mockery::mock(RequestInterface::class);
+        $exception = new RequestException('', $request);
+        $this->client->shouldReceive('request')->andThrow($exception);
+        $this->expectException(TransportException::class);
+        $this->transport->getBalance();
+    }
+
+    public function testItThrowsTransportExceptionOnJsonErrorWhileFetchingBalance()
+    {
+        $this->transport->setSessionId('sessionid');
+        $this->client->shouldReceive('request')->andThrow(\InvalidArgumentException::class);
+        $this->expectException(TransportException::class);
+        $this->transport->getBalance();
+    }
+
     /**
      * @inheritdoc
      */

@@ -38,6 +38,23 @@ class FileTransport extends Component implements ITransport
     }
 
     /**
+     * @inheritdoc
+     */
+    public function canFetchBalance()
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \matperez\yii2smssender\exceptions\TransportException
+     */
+    public function getBalance()
+    {
+        throw new TransportException('Unimplemented.');
+    }
+
+    /**
      * @param string $from
      * @param string $to
      * @param string $message

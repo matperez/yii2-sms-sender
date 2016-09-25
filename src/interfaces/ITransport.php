@@ -10,4 +10,14 @@ interface ITransport
      * @return boolean
      */
     public function send($from, $to, $message);
+
+    /**
+     * @return boolean
+     */
+    public function canFetchBalance();
+
+    /**
+     * @return mixed
+     */
+    public function getBalance();
 }

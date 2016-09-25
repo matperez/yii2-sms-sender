@@ -80,6 +80,34 @@ class IntegrationApiTransport extends Component implements ITransport
     }
 
     /**
+     * @inheritdoc
+     */
+    public function canFetchBalance()
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     * @throws \matperez\yii2smssender\exceptions\TransportException
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function getBalance()
+    {
+        if (!$this->isAuthenticated()) {
+            $this->authenticate();
+        }
+        try {
+            $response = $this->client->request('GET', $this->baseUrl.'/user/balance');
+            return \GuzzleHttp\json_decode((string)$response->getBody());
+        } catch (GuzzleException $e) {
+            throw new TransportException('Http client error: '.$e->getMessage(), $e->getCode(), $e);
+        } catch (\InvalidArgumentException $e) {
+            throw new TransportException('Unable to decode server response: '.$e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
      * @return bool
      * @throws \matperez\yii2smssender\exceptions\TransportException
      * @throws \yii\base\InvalidConfigException
