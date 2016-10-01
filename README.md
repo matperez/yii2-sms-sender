@@ -1,6 +1,7 @@
 # yii2-sms-sender
 
 [![Build Status](https://travis-ci.org/matperez/yii2-sms-sender.svg?branch=master)](https://travis-ci.org/matperez/yii2-sms-sender)
+[![Coverage Status](https://coveralls.io/repos/github/matperez/yii2-sms-sender/badge.svg?branch=master)](https://coveralls.io/github/matperez/yii2-sms-sender?branch=master)
 
 Yii2 SMS Sender
 
