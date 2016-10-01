@@ -19,7 +19,13 @@ matrix:
   include:
     - php: '7.0'
 
-before_script:
-  - travis_retry composer install --no-interaction
+install:
+  - curl -s http://getcomposer.org/installer | php
+  - php composer.phar install --dev --no-interaction
 
-script: vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-text
+script:
+  - mkdir -p build/logs
+  - php vendor/bin/phpunit -c phpunit.xml.dist
+
+after_success:
+  - travis_retry php vendor/bin/coveralls
