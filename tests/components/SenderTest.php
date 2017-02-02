@@ -54,6 +54,12 @@ class SenderTest extends TestCase
         self::assertEquals($this->sender, $message->getSender());
     }
 
+    public function testItReturnsViewPath()
+    {
+        $this->sender->viewPath = '@app/views/sms';
+        self::assertEquals($this->sender->viewPath, $this->sender->getViewPath());
+    }
+
     public function testItShouldCatchTransportExceptionsOnSend()
     {
         $message = new Message();

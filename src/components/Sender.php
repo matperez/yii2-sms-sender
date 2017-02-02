@@ -3,14 +3,14 @@ namespace matperez\yii2smssender\components;
 
 use matperez\yii2smssender\exceptions\TransportException;
 use matperez\yii2smssender\interfaces\IMessage;
-use matperez\yii2smssender\interfaces\IMessageComposer;
-use matperez\yii2smssender\interfaces\ISender;
+use matperez\yii2smssender\interfaces\ISmsSender;
 use matperez\yii2smssender\interfaces\ITransport;
 use matperez\yii2smssender\models\Message;
 use matperez\yii2smssender\transports\FileTransport;
 use yii\base\Component;
+use yii\base\ViewContextInterface;
 
-class Sender extends Component implements ISender, IMessageComposer
+class Sender extends Component implements ISmsSender, ViewContextInterface
 {
     /**
      * @var array
@@ -33,16 +33,26 @@ class Sender extends Component implements ISender, IMessageComposer
      * @inheritdoc
      * @throws \yii\base\InvalidParamException
      * @throws \yii\base\InvalidConfigException
+     * @throws \yii\base\InvalidCallException
+     * @throws \yii\base\ViewNotFoundException
      */
     public function compose($view, array $data = [])
     {
         $content = \Yii::$app->getView()
-            ->render($this->viewPath.'/'.$view, $data);
+            ->render($view, $data, $this);
         /** @var IMessage $message */
         $message = \Yii::createObject(Message::class);
         $message->setMessage($content);
         $message->setSender($this);
         return $message;
+    }
+
+    /**
+     * @return string
+     */
+    public function getViewPath()
+    {
+        return $this->viewPath;
     }
 
     /**
