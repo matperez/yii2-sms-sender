@@ -70,7 +70,7 @@ class IntegrationApiTransport extends Component implements ITransport
             'sendDate' => null,
         ];
         try {
-            $this->client->request('POST', $this->baseUrl.'/Sms/Send', ['body' => $params]);
+            $this->client->request('POST', $this->baseUrl.'/Sms/Send', ['form_params' => $params]);
         } catch (GuzzleException $e) {
             throw new TransportException('Http client error: '.$e->getMessage(), $e->getCode(), $e);
         } catch (\InvalidArgumentException $e) {
