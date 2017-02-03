@@ -8,5 +8,5 @@ interface IMessageComposer
      * @param array $data
      * @return IMessage
      */
-    public function compose($view, array $data = []);
+    public function compose($view = '', array $data = []);
 }
