@@ -54,6 +54,13 @@ class SenderTest extends TestCase
         self::assertEquals($this->sender, $message->getSender());
     }
 
+    public function testItShouldComposeEmptyMessages()
+    {
+        $message = $this->sender->compose();
+        self::assertInstanceOf(IMessage::class, $message);
+        self::assertEmpty($message->getMessage());
+    }
+
     public function testItReturnsViewPath()
     {
         $this->sender->viewPath = '@app/views/sms';

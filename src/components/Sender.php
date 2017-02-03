@@ -36,13 +36,15 @@ class Sender extends Component implements ISmsSender, ViewContextInterface
      * @throws \yii\base\InvalidCallException
      * @throws \yii\base\ViewNotFoundException
      */
-    public function compose($view, array $data = [])
+    public function compose($view = '', array $data = [])
     {
-        $content = \Yii::$app->getView()
-            ->render($view, $data, $this);
         /** @var IMessage $message */
         $message = \Yii::createObject(Message::class);
-        $message->setMessage($content);
+        if (!empty($view)) {
+            $content = \Yii::$app->getView()
+                ->render($view, $data, $this);
+            $message->setMessage($content);
+        }
         $message->setSender($this);
         return $message;
     }

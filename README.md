@@ -28,6 +28,7 @@ to the require section of your `composer.json` file.
 ```
 'components' = [
   'sms' => [
+    'viewPath' => '@app/sms',
     'class' => \matperez\yii2smssender\components\Sender::class,
     'transportConfig' => [
       'class' => \matperez\yii2smssender\transports\FileTransport::class, 
@@ -43,6 +44,7 @@ Using https://integrationapi.net
 ```
 'components' = [
   'sms' => [
+    'viewPath' => '@app/sms',
     'transportConfig' => [
       'class' => \matperez\yii2smssender\transports\IntegrationApiTransport::class,
       'login' => 'login',
@@ -52,8 +54,9 @@ Using https://integrationapi.net
 ],
 ```
 
-Container config
+### Container config
 
+Place this somewhere in a bootstrap file
 ```
 \Yii::$container->set(\GuzzleHttp\ClientInterface::class, function() {
   return new \GuzzleHttp\Client();
@@ -62,6 +65,21 @@ Container config
 
 ### Usage
  
+#### Composing a message
+
+The message can be composed from a template. The template name could be relative to `viewPath` or it could be a full path to a the view. Yii aliases are acceptable.
+
+```
+$message = Yii::$app->sms->compose('template_name', $params);
+$message = Yii::$app->sms->compose('@app/sms/template_name', $params);
+```
+
+It is also possible to compose an empty message when no view name provided
+
+```
+$message = Yii::$app->sms->compose();
+```
+
 #### Sending a message 
 
 ```
