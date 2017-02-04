@@ -20,6 +20,11 @@ class Sender extends Component implements ISmsSender, ViewContextInterface
     ];
 
     /**
+     * @var callable[]
+     */
+    public $middleware = [];
+
+    /**
      * @var string
      */
     public $viewPath = '@app/views/sms';
@@ -63,12 +68,26 @@ class Sender extends Component implements ISmsSender, ViewContextInterface
      */
     public function send(Message $message)
     {
+        $this->prepareMessage($message);
         try {
             return $this->getTransport()
                 ->send($message->getFrom(), $message->getTo(), $message->getMessage());
         } catch (TransportException $e) {
             \Yii::error('Transport exception: '.$e->getMessage(), 'sms');
             return false;
+        }
+    }
+
+    /**
+     * @param IMessage $message
+     */
+    protected function prepareMessage(IMessage $message)
+    {
+        foreach ($this->middleware as $middleware) {
+            if (!is_callable($middleware)) {
+                throw new \InvalidArgumentException('Middleware function should be callable');
+            }
+            call_user_func($middleware, $message);
         }
     }
 

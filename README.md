@@ -45,6 +45,7 @@ Using https://integrationapi.net
 'components' = [
   'sms' => [
     'viewPath' => '@app/sms',
+    'class' => \matperez\yii2smssender\components\Sender::class,
     'transportConfig' => [
       'class' => \matperez\yii2smssender\transports\IntegrationApiTransport::class,
       'login' => 'login',
@@ -53,8 +54,6 @@ Using https://integrationapi.net
   ],
 ],
 ```
-
-### Container config
 
 Place this somewhere in a bootstrap file
 ```
@@ -78,6 +77,23 @@ It is also possible to compose an empty message when no view name provided
 
 ```
 $message = Yii::$app->sms->compose();
+```
+
+#### Middleware
+
+The message can be preprocessed prior to sending. For example log or modify its content. Middleware should be set as an array of callable.
+
+```
+'components' = [
+  'sms' => [
+      'class' => \matperez\yii2smssender\components\Sender::class,
+      'middleware' => [
+          function(\matperez\yii2smssender\interfaces\IMessage $message) {
+              $message->setMessage('new message content');
+          }
+      ]
+  ],
+],
 ```
 
 #### Sending a message 

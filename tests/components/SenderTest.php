@@ -9,6 +9,7 @@ use matperez\yii2smssender\interfaces\ISender;
 use matperez\yii2smssender\interfaces\ITransport;
 use matperez\yii2smssender\models\Message;
 use matperez\yii2smssender\tests\TestCase;
+use matperez\yii2smssender\tests\StubTransport;
 use yii\helpers\FileHelper;
 
 class SenderTest extends TestCase
@@ -52,6 +53,25 @@ class SenderTest extends TestCase
         self::assertInstanceOf(IMessage::class, $message);
         self::assertEquals('template content', $message->getMessage());
         self::assertEquals($this->sender, $message->getSender());
+    }
+
+    public function testItUsesMiddlewareToPreProcessMessage()
+    {
+        $sender = new Sender([
+            'transportConfig' => [
+                'class' => StubTransport::class
+            ],
+            'middleware' => [
+                function(IMessage $message) {
+                    $message->setMessage('replaced');
+                }
+            ]
+        ]);
+        $message = new Message([
+            'message' => 'original'
+        ]);
+        $sender->send($message);
+        self::assertEquals('replaced', $message->getMessage(), 'Message is replaced');
     }
 
     public function testItShouldComposeEmptyMessages()
